@@ -66,7 +66,6 @@ class LemburController extends Controller
     {
         $request->validate([
             'tgl_pengajuan' => 'required|date',
-            'section' => 'nullable|string|max:100',
             'tgl_jam_mulai' => 'required',
             'tgl_jam_selesai' => 'required',
             'approver_id' => 'required',
@@ -103,7 +102,6 @@ class LemburController extends Controller
         Lembur::create([
             'user_id' => Auth::id(),
             'tgl_pengajuan' => $request->tgl_pengajuan,
-            'section' => $request->section,
             'tgl_jam_mulai' => $request->tgl_jam_mulai,
             'tgl_jam_selesai' => $request->tgl_jam_selesai,
             'approver_id' => $approverId,

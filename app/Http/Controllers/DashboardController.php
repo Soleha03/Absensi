@@ -17,6 +17,8 @@ class DashboardController extends Controller
         $tanggal = Carbon::today();
         $tanggalString = $tanggal->format('Y-m-d');
 
+        $alluser = User::count();
+
         // 1. Ambil semua data aksi HARI INI
 
         // (A) Aksi Aktif (Prioritas 1, 2, 3)
@@ -145,8 +147,18 @@ class DashboardController extends Controller
         // 5. Filter semua hasil 'null'
         $data = $data->filter();
 
+        $statusCounts = $data->countBy('status');
+
+        // Ambil jumlah spesifik, berikan 0 jika status tidak ada
+        $jumlahHadir = $statusCounts->get('Hadir', 0);
+        $jumlahTerlambat = $statusCounts->get('Hadir (Terlambat)', 0);
+        $jumlahTidakHadir = $statusCounts->get('Tidak Hadir', 0);
+        
+        // GABUNGKAN Hadir dan Terlambat
+        $jumlahHadirTotal = $jumlahHadir + $jumlahTerlambat;
+
         // 6. Kirim data ke view
-        return view('dashboard.hr', compact('data'));
+        return view('dashboard.hr', compact('data', 'alluser', 'jumlahHadirTotal', 'jumlahTidakHadir'));
     }
 
     public function direktur()
@@ -178,6 +190,9 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
  
+        $absensiHariIni = Absensi::where('user_id', $user->id)
+            ->whereDate('tanggal_waktu', Carbon::today()->format('Y-m-d'))
+            ->get();
         // Bisa tambahkan detail lain juga
         $cutiDisetujui = Cuti::where('user_id', $user->id)
             ->where('status_pengajuan', 'disetujui')
@@ -186,6 +201,6 @@ class DashboardController extends Controller
             ->where('status_pengajuan', 'disetujui')
             ->count();
 
-        return view('dashboard.karyawan', compact('user', 'cutiDisetujui', 'lemburDisetujui'));
+        return view('dashboard.karyawan', compact('user', 'cutiDisetujui', 'lemburDisetujui','absensiHariIni'));
     }
 }

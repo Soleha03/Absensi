@@ -3,18 +3,18 @@
 
     <!-- Brand -->
     <a class="sidebar-brand d-flex flex-column align-items-center justify-content-center py-3"
-        href="{{ route('dashboard') }}">
+        href="">
         <div class="sidebar-brand-icon mb-1">
             <img src="{{ asset('img/logo.png') }}" alt="Logo" class="img-fluid" style="width: 90px; height: auto;">
         </div>
     </a>
 
-
-    <hr class="sidebar-divider my-0">
-
     @php
         $user = Auth::user();
     @endphp
+
+    <hr class="sidebar-divider my-0">
+
 
     <li class="nav-item">
         @if ($user->role === 'hr')

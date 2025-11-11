@@ -68,7 +68,6 @@ class UserImport implements
         return [
             // Pastikan badge_number (dari kolom 'Emp. No') unik di tabel users
             'emp_no' => 'required|unique:users,badge_number',
-            
             'name' => 'required|string',
             'position' => 'nullable|string',
             'contract_permanent' => 'nullable|string',

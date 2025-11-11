@@ -68,16 +68,14 @@ class LemburImport implements
                 : null;
 
             // 6. Buat atau Update data Lembur
-            Lembur::updateOrCreate(
+            Lembur::firstOrCreate( // <-- UBAH DI SINI
                 [
                     'user_id' => $user->id,
                     'tgl_jam_mulai' => $tgl_jam_mulai, // Kunci unik
                 ],
                 [
                     'tgl_pengajuan' => $tgl_pengajuan,
-                    'section' => $row['section'] ?? null,
                     'approver_id' => $approver_id,
-                    // 'jam_kerja_id' diabaikan
                     'tgl_jam_selesai' => $tgl_jam_selesai,
                     'nama_atasan' => $nama_atasan,
                     'deskripsi_kerja' => $row['deskripsi_kerja'] ?? null,
