@@ -14,7 +14,6 @@ class Lembur extends Model
     protected $fillable = [
         'user_id',
         'tgl_pengajuan',
-        'section',
         'approver_id',
         'jam_kerja_id',
         'tgl_jam_mulai',

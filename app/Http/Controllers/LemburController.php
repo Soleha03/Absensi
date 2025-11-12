@@ -32,25 +32,21 @@ class LemburController extends Controller
 
         if ($user->role === 'atasan') {
 
-            $approvalUsers = User::where('role', 'hr')->get();
+            $approvalUsers = User::where('role', 'hr')
+                ->where('departement', $user->departement)
+                ->get();
         } elseif ($user->role === 'karyawan') {
-            if ($user->departement === 'Office') {
-
-                $approvalUsers = User::whereIn('name', ['Yeni', 'Nadirman'])->get();
-            } elseif ($user->departement === 'Sales') {
-                $approvalUsers = User::whereIn('name', ['Nadirman', 'Defri'])->get();
-            } elseif ($user->departement === 'Production') {
-                $approvalUsers = User::whereIn('name', ['Zainuddin', 'Darwin'])->get();
-            } elseif ($user->departement === 'Engineering') {
-                $approvalUsers = User::whereIn('name', ['Rafly', 'Defri'])->get();
-            }
+          $approvalUsers = User::where('role', 'atasan')
+                ->where('departement', $user->departement)
+                ->get();
         } elseif ($user->role === 'hr') {
-            $approvalUsers = User::where('role', 'direktur')->get();
+            $approvalUsers = User::where('role', 'direktur')
+                ->where('departement', $user->departement)
+                ->get();
         } elseif ($user->role === 'direktur') {
-            $approvalUsers = User::where('role', 'direktur')->get();
+            $approvalUsers = User::where('id', $user->id)->get();
         }
 
-        // Tambahan: Handle jika setelah semua logika, $approvalUsers masih kosong
         if ($approvalUsers->isEmpty()) {
             $approvalUsers = collect(['Nama Atasan Tidak Tersedia']);
         }
@@ -66,7 +62,6 @@ class LemburController extends Controller
     {
         $request->validate([
             'tgl_pengajuan' => 'required|date',
-            'section' => 'nullable|string|max:100',
             'tgl_jam_mulai' => 'required',
             'tgl_jam_selesai' => 'required',
             'approver_id' => 'required',
@@ -103,7 +98,6 @@ class LemburController extends Controller
         Lembur::create([
             'user_id' => Auth::id(),
             'tgl_pengajuan' => $request->tgl_pengajuan,
-            'section' => $request->section,
             'tgl_jam_mulai' => $request->tgl_jam_mulai,
             'tgl_jam_selesai' => $request->tgl_jam_selesai,
             'approver_id' => $approverId,

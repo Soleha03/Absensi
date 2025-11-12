@@ -96,7 +96,7 @@
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Nama Atasan</label>
                             @if (!empty($approvalUsers))
-                                <select name="approver_id" class="form-select" required>
+                                <select name="approver_id" class="form-control" required>
                                     <option value="">-- Pilih Atasan --</option>
                                     @foreach ($approvalUsers as $atasan)
                                         <option value="{{ $atasan->id }}">{{ $atasan->name }} ({{ $atasan->role }})

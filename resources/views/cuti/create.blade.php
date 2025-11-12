@@ -68,7 +68,7 @@
                             <label class="form-label fw-semibold">Nama Atasan yang Menerima Laporan</label>
 
                             @if (!empty($approvalUsers))
-                                <select name="approver_id" class="form-select" required>
+                                <select name="approver_id" class="form-control" required>
                                     <option value="">-- Pilih Atasan --</option>
                                     @foreach ($approvalUsers as $atasan)
                                         <option value="{{ $atasan->id }}">{{ $atasan->name }} ({{ $atasan->role }})
@@ -82,7 +82,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Jenis Cuti</label>
-                            <select name="jenis_cuti" id="jenis_cuti" class="form-select" required>
+                            <select name="jenis_cuti" id="jenis_cuti" class="form-control" required>
                                 <option value="">-- Pilih Jenis Cuti --</option>
                                 <option value="Cuti Tahunan">Cuti Tahunan</option>
                                 <option value="Cuti Sakit">Cuti Sakit</option>

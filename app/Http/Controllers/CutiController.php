@@ -31,25 +31,22 @@ class CutiController extends Controller
 
         if ($user->role === 'atasan') {
 
-            $approvalUsers = User::where('role', 'hr')->get();
+            $approvalUsers = User::where('role', 'hr')
+                ->where('departement', $user->departement)
+                ->get();
         } elseif ($user->role === 'karyawan') {
-            if ($user->departement === 'Office') {
-
-                $approvalUsers = User::whereIn('name', ['Yeni', 'Nadirman'])->get();
-            } elseif ($user->departement === 'Sales') {
-                $approvalUsers = User::whereIn('name', ['Nadirman', 'Defri'])->get();
-            } elseif ($user->departement === 'Production') {
-                $approvalUsers = User::whereIn('name', ['Zainuddin', 'Darwin'])->get();
-            } elseif ($user->departement === 'Engineering') {
-                $approvalUsers = User::whereIn('name', ['Rafly', 'Defri'])->get();
-            }
+            $approvalUsers = User::where('role', 'atasan')
+                ->where('departement', $user->departement)
+                ->get();
         } elseif ($user->role === 'hr') {
-            $approvalUsers = User::where('role', 'direktur')->get();
+            $approvalUsers = User::where('role', 'direktur')
+                ->where('departement', $user->departement)
+                ->get();
         } elseif ($user->role === 'direktur') {
-            $approvalUsers = User::where('role', 'direktur')->get();
+            $approvalUsers = User::where('id', $user->id)
+                ->get();
         }
 
-        // Tambahan: Handle jika setelah semua logika, $approvalUsers masih kosong
         if (empty($approvalUsers)) {
             $approvalUsers = 'Nama Atasan Tidak Tersedia';
         }
@@ -59,7 +56,7 @@ class CutiController extends Controller
 
     public function store(Request $request)
     {
-        // ✅ Validasi input
+
         $request->validate([
             'tgl_mulai'     => 'required|date',
             'tgl_selesai'   => 'required|date|after_or_equal:tgl_mulai',
@@ -69,17 +66,16 @@ class CutiController extends Controller
             'approver_id'   => 'required|exists:users,id',
         ]);
 
-        // ✅ Ambil user yang sedang login
+      
         $user = Auth::user();
         $status = 'menunggu';
         $approverId = $request->approver_id;
 
         if ($user->role === 'direktur') {
             $status = 'disetujui';
-            $approverId = $user->id; // Direktur menyetujui sendiri
+            $approverId = $user->id;
         }
 
-        // ✅ Simpan pengajuan cuti
         Cuti::create([
             'user_id'          => $user->id,
             'tgl_pengajuan'    => now(),
@@ -98,9 +94,6 @@ class CutiController extends Controller
     }
 
 
-    /**
-     * Menampilkan halaman approval cuti (untuk atasan/HR/direktur)
-     */
     public function approvalIndex(Request $request)
     {
         $user = Auth::user();
@@ -161,16 +154,13 @@ class CutiController extends Controller
         $tahun = $request->get('tahun', date('Y'));
         $department = $request->get('department', '');
 
-        // --- 2. AMBIL DAFTAR DEPARTEMEN UNIK ---
-        // Mengambil semua 'department' yang unik dari tabel user,
-        // mengabaikan yang null, dan mengurutkannya.
         $departments = User::select('departement')
             ->whereNotNull('departement')
             ->distinct()
             ->orderBy('departement', 'asc')
             ->pluck('departement');
 
-        // Query Cuti (kode Anda sebelumnya sudah benar)
+
         $query = Cuti::with('user')
             ->whereMonth('tgl_pengajuan', $bulan)
             ->whereYear('tgl_pengajuan', $tahun);
@@ -184,16 +174,16 @@ class CutiController extends Controller
                 $userQuery->where('departement', $department);
             });
         }
+        $query -> orderBy('tgl_pengajuan', 'desc');
 
         $cutis = $query->paginate(10);
 
-        // --- 3. KIRIMKAN $departments KE VIEW ---
         return view('cuti.data', compact(
             'cutis',
             'bulan',
             'tahun',
             'department',
-            'departments' // <-- Tambahkan ini
+            'departments'
         ));
     }
 

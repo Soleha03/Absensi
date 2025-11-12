@@ -19,7 +19,6 @@ return new class extends Migration
         $table->time('tgl_jam_mulai');
         $table->time('tgl_jam_selesai');
         $table->text('deskripsi_kerja');
-        $table->text('section');
         $table->text('nama_atasan');
         $table->string('tanda_tangan');
         $table->foreignId('jam_kerja_id')->constrained('jam_kerjas')->onDelete('cascade');
