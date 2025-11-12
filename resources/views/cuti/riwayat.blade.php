@@ -208,7 +208,6 @@
         const closeButton = document.getElementById('btnCloseModal');
         const actionDiv = document.getElementById('action-buttons');
 
-        // ✅ Fungsi format tanggal 
         function formatTanggal(dateString) {
             if (!dateString) return '-';
             const options = {
@@ -219,14 +218,39 @@
             return new Date(dateString).toLocaleDateString('id-ID', options);
         }
 
-        // ✅ Fungsi hitung lama cuti (dalam hari)
-        function hitungLamaCuti(tglMulai, tglSelesai) {
+
+        async function hitungLamaCuti(tglMulai, tglSelesai) {
             if (!tglMulai || !tglSelesai) return '-';
+
             const start = new Date(tglMulai);
             const end = new Date(tglSelesai);
-            const selisihMs = end - start; // hasil dalam milidetik
-            const lamaHari = Math.ceil(selisihMs / (1000 * 60 * 60 * 24)) + 1; // +1 agar inklusif
-            return lamaHari > 0 ? lamaHari : 0; // pastikan tidak negatif
+
+            const response = await fetch('https://api-harilibur.vercel.app/api');
+            const data = await response.json();
+
+            // Ambil hanya tanggal merah (is_national_holiday = true)
+            const tanggalMerah = data
+                .filter(item => item.is_national_holiday)
+                .map(item => item.holiday_date);
+
+            let lamaCuti = 0;
+            let current = new Date(start);
+
+            while (current <= end) {
+                const day = current.getDay(); // 0 = Minggu, 6 = Sabtu
+                const dateStr = current.toISOString().split('T')[0];
+
+                const isWeekend = (day === 0 || day === 6);
+                const isHoliday = tanggalMerah.includes(dateStr);
+
+                if (!isWeekend && !isHoliday) {
+                    lamaCuti++;
+                }
+
+                current.setDate(current.getDate() + 1);
+            }
+
+            return lamaCuti;
         }
 
         // ✅ Tutup modal
@@ -254,10 +278,14 @@
                         document.getElementById('detail-selesai').textContent =
                             formatTanggal(data.tgl_selesai);
 
-                        // ✅ Hitung lama cuti otomatis
-                        const lamaCuti = hitungLamaCuti(data.tgl_mulai, data.tgl_selesai);
-                        document.getElementById('detail-lama').textContent =
-                            `${lamaCuti} hari`;
+
+                        async function tampilkanDetail(data) {
+                            const lamaCuti = await hitungLamaCuti(data.tgl_mulai, data
+                                .tgl_selesai);
+                            document.getElementById('detail-lama').textContent =
+                                `${lamaCuti} hari`;
+                        }
+                        tampilkanDetail(data);
 
                         document.getElementById('detail-alasan').textContent = data
                             .alasan ?? '-';
@@ -266,7 +294,7 @@
 
                         // Status badge
                         let statusBadge = '';
-                        switch (data.status) {
+                        switch (data.status_pengajuan) {
                             case 'disetujui':
                                 statusBadge =
                                     '<span class="badge bg-success">Disetujui</span>';

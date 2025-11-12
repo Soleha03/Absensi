@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Validators\Failure;
-use PhpOffice\PhpSpreadsheet\Shared\Date; // Untuk helper tanggal
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Carbon\Carbon;
 
 class CutiImport implements 
@@ -24,7 +24,7 @@ class CutiImport implements
     */
     public function collection(Collection $rows)
     {
-        // Cache untuk user dan atasan agar tidak query berulang-ulang
+       
         $userCache = [];
         $atasanCache = [];
 
@@ -68,16 +68,14 @@ class CutiImport implements
                 default => 'menunggu', // Default jika tidak dikenal
             };
 
-            // 5. Buat atau Update data Cuti
-            // Mencari cuti berdasarkan user & tgl mulai.
-            Cuti::updateOrCreate(
+            Cuti::firstOrCreate(
                 [
                     'user_id' => $user->id,
+                    'tgl_pengajuan' => $tgl_pengajuan,
                     'tgl_mulai' => $tgl_mulai,
+                    'tgl_selesai' => $tgl_selesai,
                 ],
                 [
-                    'tgl_pengajuan' => $tgl_pengajuan,
-                    'tgl_selesai' => $tgl_selesai,
                     'jenis_cuti' => $row['jenis_cuti'] ?? 'Cuti', 
                     'status_pengajuan' => $status_enum,
                     'approver_id' => $approver_id,

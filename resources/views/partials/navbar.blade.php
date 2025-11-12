@@ -9,7 +9,7 @@
         <li class="nav-item dropdown no-arrow">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">
                 <img class="img-profile rounded-circle mr-2"
-                    src="{{ Auth::user()->foto ? asset('storage/' . Auth::user()->foto) : asset('.png') }}"
+                    src="{{ Auth::user()->foto ? asset('storage/' . Auth::user()->foto) : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}"
                     width="35" height="35">
                 <div class="d-none d-lg-block text-end">
                     <div class="fw-semibold text-dark">{{ Auth::user()->name }}</div>
